@@ -414,12 +414,11 @@
         float zone=smoothstep(.35,.7,n(p*1.3+t*.4));
         float I=glow*(1.-(.6+.3*E)*edge*zone*(1.-lines))+fold*glow*.35;
         vec3 c=vec3(0.);
-        c=mix(c,vec3(.22,.035,.0),smoothstep(.0,.2,I));
-        c=mix(c,vec3(.95,.3,.04),smoothstep(.15,.6,I));
-        c=mix(c,vec3(1.,.58,.16),smoothstep(.55,.9,I));
-        c=mix(c,vec3(1.,.86,.6),smoothstep(.92,1.25,I));
-        float pr=smoothstep(.62,.9,r.x)*smoothstep(.55,1.,uv.x/asp)*smoothstep(.6,.0,uv.y);
-        c=mix(c,c*vec3(.75,.45,1.6)+vec3(.12,.0,.22)*I,pr*.8);
+        // monochrome silk: black → graphite → silver → white
+        c=mix(c,vec3(.07),smoothstep(.0,.2,I));
+        c=mix(c,vec3(.42),smoothstep(.15,.6,I));
+        c=mix(c,vec3(.78),smoothstep(.55,.9,I));
+        c=mix(c,vec3(.97),smoothstep(.92,1.25,I));
         c+=(h(gl_FragCoord.xy+fract(T*13.)*97.)-.5)*.035;
         gl_FragColor=vec4(c,1.);
       }`;
