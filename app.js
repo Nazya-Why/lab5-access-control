@@ -274,7 +274,6 @@
     if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
     else document.exitFullscreen?.();
   }
-  $('#fs').onclick = toggleFs;
 
   // Lightbox
   const lb = $('#lb');
