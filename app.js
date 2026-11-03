@@ -22,7 +22,6 @@
         <div class="label rv" style="--i:0;margin-bottom:3vh">${R.meta.course} — Лабораторна робота №5</div>
         <h1 class="display lines">${ln([['Broken'], ['Access', 'o'], ['Control']], 1)}</h1>
       </div>
-      <div class="hero-v vert rv" style="--i:3">Уразливості контролю доступу<small>ЛР 5 · ${R.meta.city.replace(/\D+/g, '')}</small></div>
       <div class="hero-f rv" style="--i:4">
         <div><span class="k">Виконав(ла)</span><b>${R.meta.author}</b>ст. гр. ${R.meta.group}</div>
         <div><span class="k">Прийняв</span><b>${R.meta.teacher}</b>${R.meta.teacherTitle}</div>
@@ -125,7 +124,6 @@
     html: `
       <h1 class="display lines">${ln([['Дякую'], ['за увагу.', 'o']])}</h1>
       <div class="thx-f rv" style="--i:2">
-        <span>${R.meta.author} · ${R.meta.group}</span>
         <a href="https://portswigger.net/web-security/access-control" target="_blank" rel="noopener">PortSwigger · Access control ↗</a>
         <button class="lg" data-go="0">На початок ↑</button>
       </div>`
