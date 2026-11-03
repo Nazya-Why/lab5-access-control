@@ -23,7 +23,7 @@
         <h1 class="display lines">${ln([['Broken'], ['Access', 'o'], ['Control']], 1)}</h1>
       </div>
       <div class="hero-f rv" style="--i:4">
-        <div><span class="k">Виконав(ла)</span><b>${R.meta.author}</b>ст. гр. ${R.meta.group}</div>
+        <div><span class="k">Виконали</span><b>Студенти групи ${R.meta.group}</b></div>
         <div><span class="k">Прийняв</span><b>${R.meta.teacher}</b>${R.meta.teacherTitle}</div>
         <div><span class="k">${R.meta.org}</span>${R.meta.city}</div>
         <span class="sp"></span>
