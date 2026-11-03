@@ -8,6 +8,9 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const KIND = { v: 'Вертикальна ескалація', h: 'Горизонтальна · IDOR' };
   const vh = () => innerHeight;
+  // headline lines slide up out of a mask, one after another
+  const ln = (arr, i0 = 0) => arr.map(([t, c = ''], k) =>
+    `<span class="ln" style="--l:${i0 + k}"><span class="${c}">${t}</span></span>`).join('');
 
   /* ───────────────── Sections ───────────────── */
   const S = [];   // { type, label, html, lab?, steps? }
@@ -17,7 +20,7 @@
     html: `
       <div class="hero-t">
         <div class="label rv" style="--i:0;margin-bottom:3vh">${R.meta.course} — Лабораторна робота №5</div>
-        <h1 class="display rv" style="--i:1"><span>Broken</span><span class="o">Access</span><span>Control</span></h1>
+        <h1 class="display lines">${ln([['Broken'], ['Access', 'o'], ['Control']], 1)}</h1>
       </div>
       <div class="hero-v vert rv" style="--i:3">Уразливості контролю доступу<small>ЛР 5 · ${R.meta.city.replace(/\D+/g, '')}</small></div>
       <div class="hero-f rv" style="--i:4">
@@ -60,7 +63,7 @@
       <div class="over-h">
         <div style="display:flex;flex-direction:column;gap:2vh">
           <div class="label rv" style="--i:0">02 — Завдання</div>
-          <h2 class="display rv" style="--i:1"><span>Дев’ять </span><span class="m">лабораторних</span></h2>
+          <h2 class="display lines">${ln([['Дев’ять&nbsp;'], ['завдань', 'm']], 1)}</h2>
         </div>
         <div class="legend rv" style="--i:2"><span>Вертикальна</span><span class="h">Горизонтальна · IDOR</span></div>
       </div>
@@ -95,10 +98,12 @@
                 </button></li>`).join('')}
             </ol>
           </div>
-          <figure class="viewer lg rv" style="--i:2">
-            <div class="vimg" role="button" tabindex="0" aria-label="Відкрити скріншот на весь екран"><img alt=""><img alt=""></div>
-            <figcaption class="vfoot"><span class="vcap"></span><span class="vstep"></span></figcaption>
-          </figure>
+          <div class="vwrap rv" style="--i:2">
+            <figure class="viewer lg">
+              <div class="vimg" role="button" tabindex="0" aria-label="Відкрити скріншот на весь екран"><img alt=""><img alt=""><span class="vzoom">⤢</span></div>
+              <figcaption class="vfoot"><span class="vcap"></span><span class="vstep"><b></b><i>/ ${pad(n)}</i></span></figcaption>
+            </figure>
+          </div>
         </div>`
     });
   });
@@ -118,8 +123,7 @@
   S.push({
     type: 'thx', label: 'Кінець',
     html: `
-      <h1 class="display rv" style="--i:0"><span>Дякую</span><span class="o">за увагу.</span></h1>
-      <div class="thx-v vert rv" style="--i:1">Питання?<small>${R.meta.author}</small></div>
+      <h1 class="display lines">${ln([['Дякую'], ['за увагу.', 'o']])}</h1>
       <div class="thx-f rv" style="--i:2">
         <span>${R.meta.author} · ${R.meta.group}</span>
         <a href="https://portswigger.net/web-security/access-control" target="_blank" rel="noopener">PortSwigger · Access control ↗</a>
@@ -194,23 +198,23 @@
       if (list.scrollHeight > list.clientHeight) list.scrollTo({ top: li.offsetTop - list.clientHeight / 2 + li.offsetHeight / 2, behavior: reduced ? 'auto' : 'smooth' });
     }
     $('.vcap', el).textContent = cap(figN);
-    $('.vstep', el).textContent = `КРОК ${pad(step + 1)} / ${pad(s.steps)}`;
+    const num = $('.vstep b', el);
+    if (num.textContent !== pad(step + 1)) {
+      num.textContent = pad(step + 1);
+      num.classList.remove('tick'); void num.offsetWidth; num.classList.add('tick');
+    }
 
     const [a, b] = $$('.vimg img', el);
     const shown = a.classList.contains('show') ? a : b.classList.contains('show') ? b : null;
     const src = fig(figN);
     if (shown && shown.getAttribute('src') === src) return;
     const nxt = shown === a ? b : a;
-    nxt.style.transform = forward ? '' : 'translateY(-14px) scale(.985)';
+    el.dataset.dir = forward ? 'down' : 'up';
     nxt.onload = () => {
+      fitViewer(i, nxt.naturalWidth, nxt.naturalHeight);
       requestAnimationFrame(() => {
-        nxt.style.transform = '';
         nxt.classList.remove('out'); nxt.classList.add('show');
-        if (shown) {
-          shown.classList.remove('show');
-          shown.style.transform = forward ? '' : 'translateY(14px) scale(.985)';
-          if (forward) shown.classList.add('out');
-        }
+        if (shown) { shown.classList.remove('show'); shown.classList.add('out'); }
       });
     };
     nxt.alt = cap(figN);
@@ -221,8 +225,24 @@
     if (nf) new Image().src = fig(nf);
   }
 
+  // The frame takes the exact aspect of the screenshot, so there is never an empty band around it.
+  const dims = new Map();   // section → [w, h] of the shown screenshot
+  function fitViewer(i, w, h) {
+    if (!w || !h) return;
+    dims.set(i, [w, h]);
+    const el = secs[i], wrap = $('.vwrap', el), box = $('.vimg', el);
+    const pad = 20, foot = $('.vfoot', el).offsetHeight || 44;
+    const AW = wrap.clientWidth - pad, AH = wrap.clientHeight - pad - foot;
+    const s = Math.min(AW / w, AH / h, 1.6);
+    box.style.width = Math.round(w * s) + 'px';
+    box.style.height = Math.round(h * s) + 'px';
+  }
+
   addEventListener('scroll', () => requestAnimationFrame(onScroll), { passive: true });
-  addEventListener('resize', () => requestAnimationFrame(onScroll));
+  addEventListener('resize', () => requestAnimationFrame(() => {
+    onScroll();
+    dims.forEach(([w, h], i) => fitViewer(i, w, h));
+  }));
 
   /* ───────────────── Input ───────────────── */
   document.addEventListener('click', e => {
@@ -318,8 +338,39 @@
     el.style.backdropFilter = `url(#${id}) blur(${blur}px) saturate(170%) brightness(1.05)`;
   }
   if (chromium) {
-    const ro = new ResizeObserver(entries => entries.forEach(en => lens(en.target)));
+    // frames morph between screenshot sizes, so rebuild the lens at most every 140 ms
+    const pending = new Set();
+    let timer = 0;
+    const ro = new ResizeObserver(entries => {
+      entries.forEach(en => {
+        pending.add(en.target);
+        en.target.style.backdropFilter = '';   // plain glass while the size is changing
+      });
+      clearTimeout(timer);
+      timer = setTimeout(() => { pending.forEach(lens); pending.clear(); }, 140);
+    });
     $$('.lg').forEach(el => ro.observe(el));
+  }
+
+  // Cursor ring: follows the pointer with a critically damped lag, grows over anything clickable
+  const cursor = $('#cursor');
+  const fine = matchMedia('(pointer: fine)').matches && !reduced;
+  if (fine) {
+    let cx = -100, cy = -100, tx = -100, ty = -100, k = 1, tk = 1, prevT = performance.now();
+    addEventListener('pointermove', e => {
+      tx = e.clientX; ty = e.clientY;
+      tk = e.target.closest('a, button, .vimg, [data-go], [data-step]') ? 1.9 : 1;
+      cursor.classList.add('on');
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => cursor.classList.remove('on'));
+    document.addEventListener('pointerdown', () => { tk *= .8; });
+    (function loop(now) {
+      const dt = Math.min(.05, (now - prevT) / 1000); prevT = now;
+      const a = 1 - Math.exp(-dt * 18), b = 1 - Math.exp(-dt * 12);
+      cx += (tx - cx) * a; cy += (ty - cy) * a; k += (tk - k) * b;
+      cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) scale(${k})`;
+      requestAnimationFrame(loop);
+    })(prevT);
   }
 
   // specular light follows the pointer
