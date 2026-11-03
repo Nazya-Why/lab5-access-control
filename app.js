@@ -44,12 +44,12 @@
       </div>
       <div class="goal-r">
         <div class="esc lg rv" style="--i:2">
-          <div class="row"><h3>Вертикальна ескалація</h3><span class="labs">ЛАБИ ${range(ids('v'))}</span></div>
+          <div class="row"><h3>Вертикальна ескалація</h3><span class="labs">ЗАВДАННЯ ${range(ids('v'))}</span></div>
           <div class="esc-viz"><span class="u">user</span><span class="ar"></span><span class="u hot">admin</span></div>
           <p>Звичайний користувач отримує доступ до функцій вищого рівня привілеїв.</p>
         </div>
         <div class="esc lg rv" style="--i:3">
-          <div class="row"><h3>Горизонтальна · IDOR</h3><span class="labs">ЛАБИ ${range(ids('h'))}</span></div>
+          <div class="row"><h3>Горизонтальна · IDOR</h3><span class="labs">ЗАВДАННЯ ${range(ids('h'))}</span></div>
           <div class="esc-viz"><span class="u">wiener</span><span class="ar both"></span><span class="u hot">carlos</span></div>
           <p>Користувач отримує доступ до даних іншого користувача того ж рівня.</p>
         </div>
@@ -78,7 +78,7 @@
   R.labs.forEach((l, i) => {
     const n = l.steps.length;
     S.push({
-      type: 'lab', label: `Лаба ${pad(i + 1)}`, lab: l, steps: n,
+      type: 'lab', label: `Завдання ${pad(i + 1)}`, lab: l, steps: n,
       html: `
         ${l.steps.map((_, k) => `<i class="snap" style="top:${k * 100}vh"></i>`).join('')}
         <div class="stage">
